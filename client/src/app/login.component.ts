@@ -17,6 +17,7 @@ export class LoginComponent {
 
     auth(form:NgForm){
         this.details = form.value;
+        console.log(this.details);
         this.loginservice.authenticate(this.details.email,this.details.password).subscribe(response=>{
             console.log(response);
         })
