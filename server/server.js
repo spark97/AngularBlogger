@@ -32,7 +32,7 @@ app.post('/auth',function(req,res,next){
             res.end(response);
         }
         else{
-            var arr = {"resp":"correct"};
+            var arr = {"resp":"correct","email":email};
             var response = JSON.stringify(arr);
             console.log(response);
             res.end(response);
