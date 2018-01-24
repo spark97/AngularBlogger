@@ -17,9 +17,20 @@ export class LoginComponent {
         private router : Router 
 ){}
 
-    details : any ;
-    status : string ;
-    user_email : string ;
+details : any ;
+status : string ;
+user_email : string ;
+current_user : any ;
+
+
+
+    checkLoggedIn(){
+        console.log("Inside function");
+        this.current_user = JSON.parse(localStorage.getItem("currentUser"));
+        if(this.current_user){
+            this.router.navigate([""]);
+        }
+    }
 
 
     auth(form:NgForm){
