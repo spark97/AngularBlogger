@@ -1,41 +1,51 @@
 var express = require('express');
-var mysql = require('mysql');
 var dbconfig = require('./config/database');
-var dbconnection = mysql.createConnection(dbconfig.connection);
+var CredentialsModel = require('./models/Credentials');
 var bodyparser = require('body-parser');
 var cors = require('cors');
-//Specifying the database to be used
-dbconnection.query("USE " + dbconfig.database);
-
 var app = express();
 var port = 3000 ;
 
 app.use(bodyparser());
 app.use(cors());
 
+//Utility Functions
+function isEmpty(obj) {
+    return !Object.keys(obj).length > 0;
+}
+
+
 //API endpoint for authenticating user
 app.post('/auth',function(req,res,next){
     var email = req.body.email ;
     var password = req.body.password ;
-    console.log(email,password);
-    dbconnection.query("SELECT * FROM users WHERE email = ? AND password = ? ",[email,password],function(err,rows){
-        if(err){
-            var arr = {"resp":"error"};
-            var response = JSON.stringify(arr);
-            console.log(response);
-            res.end(response);
+
+    var credentials = new CredentialsModel(
+        {
+            "email":email,
+            "password":password
         }
-        else if(rows.length == 0){
-            var arr = {"resp":"incorrect"};
-            var response = JSON.stringify(arr);
-            console.log(response);
-            res.end(response);
+    )
+
+    CredentialsModel.find(credentials,function(err,doc){
+        if(err){
+            console.log("Error occured while searching for user");
+        }
+        else if(isEmpty(doc)){
+            var response = {
+                "status" : "failure",
+                "email"  : ""
+            }
+            console.log("Invalid Authentication Details. Response Sent : " + response);
+            return response;
         }
         else{
-            var arr = {"resp":"correct","email":email};
-            var response = JSON.stringify(arr);
-            console.log(response);
-            res.end(response);
+            var response = {
+                "status" : "success",
+                "email"  : doc.email
+            }
+            console.log("Correct Authentication Details. Response Sent : " + response);
+            return response;
         }
     })
 
